@@ -117,116 +117,99 @@
                 'M': 250, 'N': 250, 'O': 250
             };
 
-            React.useEffect(() => {
-                // Simulate some seats being booked
-                const bookedSeats = [10, 11, 50, 51, 100, 101];
-                setSeats(seats.map((seat, index) => bookedSeats.includes(index) ? 'booked' : seat));
-            }, []);
+          import React from 'react';
 
-            const toggleSeat = (index) => {
-                if (seats[index] === 'available') {
-                    setSeats(seats.map((seat, i) => i === index ? 'selected' : seat));
-                    setSelectedSeats([...selectedSeats, index]);
-                } else if (seats[index] === 'selected') {
-                    setSeats(seats.map((seat, i) => i === index ? 'available' : seat));
-                    setSelectedSeats(selectedSeats.filter(seat => seat !== index));
-                }
-            };
+const MovieBooking = () => {
+    const [seats, setSeats] = React.useState(Array(286).fill('available')); // Initialize seats
+    const [selectedSeats, setSelectedSeats] = React.useState([]);
+    const [name, setName] = React.useState('');
+    const [phone, setPhone] = React.useState('');
 
-            const getSeatNumber = (index) => {
-                const row = String.fromCharCode(65 + Math.floor(index / 22));
-                const number = (index % 22) + 1;
-                return `${row}${number}`;
-            };
+    // Load seats from localStorage
+    React.useEffect(() => {
+        const savedSeats = localStorage.getItem('seats');
+        if (savedSeats) {
+            setSeats(JSON.parse(savedSeats)); // Load saved seat data from localStorage
+        }
+    }, []);
 
-            const getSeatPrice = (index) => {
-                const row = String.fromCharCode(65 + Math.floor(index / 22));
-                return seatPrices[row] || 250;
-            };
+    // Function to toggle seat status
+    const toggleSeat = (index) => {
+        if (seats[index] === 'available') {
+            seats[index] = 'booked'; // Change to booked
+            setSelectedSeats([...selectedSeats, index]); // Track booked seat
+            localStorage.setItem('seats', JSON.stringify(seats)); // Save to localStorage
+            setSeats([...seats]); // Update state to trigger re-render
+        } else {
+            alert('This seat is already booked!');
+        }
+    };
 
-            const getSeatClass = (status, index) => {
-                const row = String.fromCharCode(65 + Math.floor(index / 22));
-                let rowClass = 'm-o';
-                if (row === 'V') rowClass = 'vip';
-                else if (['A', 'B'].includes(row)) rowClass = 'a-b';
-                else if (['C', 'D', 'E'].includes(row)) rowClass = 'c-e';
-                else if (['F', 'G'].includes(row)) rowClass = 'f-g';
-                else if (['H', 'I', 'J', 'K', 'L'].includes(row)) rowClass = 'h-l';
-                return `seat ${status} ${rowClass}`;
-            };
+    // Function to get seat number
+    const getSeatNumber = (index) => index + 1; // Just return seat index as number
 
-            const handleSubmit = (e) => {
-                e.preventDefault();
-                console.log('Booking:', { name, phone, seats: selectedSeats.map(getSeatNumber) });
-                alert('Booking submitted! Please send payment slip via WhatsApp to confirm.');
-            };
+    // Function to get seat class
+    const getSeatClass = (status) => {
+        return `seat ${status}`;
+    };
 
-            return (
-                <div className="container">
-                    <h1>Jatt & Juliet - ICON SIAM</h1>
-                    <h2>Sunday 7th July 2024 - 4 PM</h2>
-                    <div className="seat-chart">
-                        {seats.map((status, index) => (
-                            <div 
-                                key={index} 
-                                className={getSeatClass(status, index)}
-                                onClick={() => status !== 'booked' && toggleSeat(index)}
-                            >
-                                {getSeatNumber(index)}
-                            </div>
-                        ))}
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        alert(`Booking confirmed for: ${name}, Phone: ${phone}, Seats: ${selectedSeats.map(getSeatNumber).join(', ')}`);
+        // Reset form and selections
+        setName('');
+        setPhone('');
+        setSelectedSeats([]);
+    };
+
+    return (
+        <div className="container">
+            <h1>Jatt & Juliet - ICON SIAM</h1>
+            <h2>Sunday 7th July 2024 - 4 PM</h2>
+            <div className="seat-chart">
+                {seats.map((status, index) => (
+                    <div 
+                        key={index} 
+                        className={getSeatClass(status)}
+                        onClick={() => toggleSeat(index)}
+                    >
+                        {getSeatNumber(index)}
                     </div>
-                    <div>
-                        <h3>Selected Seats: {selectedSeats.map(getSeatNumber).join(', ')}</h3>
-                        <h3>Total Price: {selectedSeats.reduce((sum, seat) => sum + getSeatPrice(seat), 0)} THB</h3>
-                    </div>
-                    <form onSubmit={handleSubmit}>
-                        <input 
-                            type="text" 
-                            placeholder="Name" 
-                            value={name} 
-                            onChange={(e) => setName(e.target.value)} 
-                            required 
-                        />
-                        <input 
-                            type="tel" 
-                            placeholder="Phone Number" 
-                            value={phone} 
-                            onChange={(e) => setPhone(e.target.value)} 
-                            required 
-                        />
-                        <button type="submit">Book Seats</button>
-                    </form>
-                    <div className="legend">
-                        <div className="legend-item">
-                            <div className="legend-color vip"></div>
-                            <span>VIP - 750 THB</span>
-                        </div>
-                        <div className="legend-item">
-                            <div className="legend-color a-b"></div>
-                            <span>A-B - 500 THB</span>
-                        </div>
-                        <div className="legend-item">
-                            <div className="legend-color c-e"></div>
-                            <span>C-E - 400 THB</span>
-                        </div>
-                        <div className="legend-item">
-                            <div className="legend-color f-g"></div>
-                            <span>F-G - 350 THB</span>
-                        </div>
-                        <div className="legend-item">
-                            <div className="legend-color h-l"></div>
-                            <span>H-L - 300 THB</span>
-                        </div>
-                        <div className="legend-item">
-                            <div className="legend-color m-o"></div>
-                            <span>M-O - 250 THB</span>
-                        </div>
-                    </div>
+                ))}
+            </div>
+            <h3>Booked Seats: {selectedSeats.map(getSeatNumber).join(', ')}</h3>
+            <form onSubmit={handleSubmit}>
+                <input 
+                    type="text" 
+                    placeholder="Name" 
+                    value={name} 
+                    onChange={(e) => setName(e.target.value)} 
+                    required 
+                />
+                <input 
+                    type="tel" 
+                    placeholder="Phone Number" 
+                    value={phone} 
+                    onChange={(e) => setPhone(e.target.value)} 
+                    required 
+                />
+                <button type="submit">Book Seats</button>
+            </form>
+            <div className="legend">
+                <div className="legend-item">
+                    <div className="legend-color booked"></div>
+                    <span>Booked</span>
                 </div>
-            );
-        };
+                <div className="legend-item">
+                    <div className="legend-color available"></div>
+                    <span>Available</span>
+                </div>
+            </div>
+        </div>
+    );
+};
 
+export default MovieBooking;
         ReactDOM.render(<MovieBooking />, document.getElementById('root'));
     </script>
 </body>
