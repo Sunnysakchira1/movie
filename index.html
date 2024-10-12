@@ -3,32 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bollywood Movie Booking</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+    <title>Movie Booking App</title>
     <style>
         body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-family: Arial, sans-serif; 
             background-color: #f0f8ff; 
-            color: #333;
-            margin: 0;
-            padding: 0;
+            color: #333; 
+            margin: 0; 
+            padding: 20px; 
         }
         .container { 
-            max-width: 1000px; 
+            max-width: 800px; 
             margin: 0 auto; 
-            padding: 20px;
-            background-color: white;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            border-radius: 8px;
+            padding: 20px; 
+            background-color: white; 
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+            border-radius: 8px; 
         }
-        h1, h2 { text-align: center; color: #0066cc; }
+        h1 { text-align: center; }
         .seat-chart { 
             display: grid; 
             grid-template-columns: repeat(22, 1fr); 
             gap: 4px; 
-            margin-bottom: 20px;
+            margin-bottom: 20px; 
         }
         .seat { 
             width: 30px; 
@@ -37,197 +34,73 @@
             align-items: center; 
             justify-content: center; 
             cursor: pointer; 
-            border-radius: 4px;
-            font-size: 10px;
-            transition: all 0.3s ease;
-        }
-        .seat:hover { transform: scale(1.1); }
-        .booked { background-color: #ff6b6b !important; color: white; cursor: not-allowed; }
-        .selected { 
-            border: 2px solid #0066cc; 
-            animation: pulse 0.5s;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        .vip { background: linear-gradient(to bottom, #f0f8ff, #d6e9ff); }
-        .a-b { background: linear-gradient(to bottom, #e6f2ff, #c2e0ff); }
-        .c-e { background: linear-gradient(to bottom, #d6e9ff, #a3d1ff); }
-        .f-g { background: linear-gradient(to bottom, #c2e0ff, #80bfff); }
-        .h-l { background: linear-gradient(to bottom, #a3d1ff, #66b3ff); }
-        .m-o { background: linear-gradient(to bottom, #80bfff, #4da6ff); }
-        .legend { 
-            position: fixed; 
-            bottom: 20px; 
-            right: 20px; 
-            background-color: white;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-        .legend-item { 
-            display: flex; 
-            align-items: center; 
-            margin-bottom: 5px;
-        }
-        .legend-color { 
-            width: 20px; 
-            height: 20px; 
-            margin-right: 10px;
-            border-radius: 4px;
-        }
-        form { 
-            display: grid; 
-            gap: 10px; 
-            max-width: 400px; 
-            margin: 20px auto;
-        }
-        input, button { 
-            padding: 10px; 
             border-radius: 4px; 
-            border: 1px solid #ccc;
+            transition: background-color 0.3s ease; 
         }
+        .booked { background-color: red; color: white; cursor: not-allowed; }
+        .available { background-color: green; color: white; }
         button { 
+            display: block; 
+            margin: 20px auto; 
+            padding: 10px 15px; 
+            border-radius: 4px; 
+            border: none; 
             background-color: #0066cc; 
             color: white; 
-            border: none; 
             cursor: pointer; 
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease; 
         }
         button:hover { background-color: #0052a3; }
+        .legend { margin-top: 20px; }
+        .legend-item { margin-bottom: 5px; }
     </style>
 </head>
 <body>
-    <div id="root"></div>
-    <script type="text/babel">
-        const MovieBooking = () => {
-            const [seats, setSeats] = React.useState(Array(286).fill('available'));
-            const [selectedSeats, setSelectedSeats] = React.useState([]);
-            const [name, setName] = React.useState('');
-            const [phone, setPhone] = React.useState('');
+    <div class="container">
+        <h1>Movie Booking App</h1>
+        <button onclick="window.location.href='admin.html'">Admin Panel</button>
+        <div class="seat-chart" id="seat-chart"></div>
+        <h3 id="selected-seats">Selected Seats: </h3>
+    </div>
 
-            const seatPrices = {
-                'VIP': 750,
-                'A': 500, 'B': 500,
-                'C': 400, 'D': 400, 'E': 400,
-                'F': 350, 'G': 350,
-                'H': 300, 'I': 300, 'J': 300, 'K': 300, 'L': 300,
-                'M': 250, 'N': 250, 'O': 250
-            };
+    <script>
+        // Initialize seat data
+        const seats = JSON.parse(localStorage.getItem('seats')) || Array(286).fill('available');
+        const seatChart = document.getElementById('seat-chart');
+        const selectedSeatsText = document.getElementById('selected-seats');
 
-            React.useEffect(() => {
-                // Simulate some seats being booked
-                const bookedSeats = [10, 11, 50, 51, 100, 101];
-                setSeats(seats.map((seat, index) => bookedSeats.includes(index) ? 'booked' : seat));
-            }, []);
+        // Function to render the seats
+        function renderSeats() {
+            seatChart.innerHTML = ''; // Clear existing seats
+            seats.forEach((status, index) => {
+                const seatDiv = document.createElement('div');
+                seatDiv.className = `seat ${status}`;
+                seatDiv.textContent = index + 1;
 
-            const toggleSeat = (index) => {
-                if (seats[index] === 'available') {
-                    setSeats(seats.map((seat, i) => i === index ? 'selected' : seat));
-                    setSelectedSeats([...selectedSeats, index]);
-                } else if (seats[index] === 'selected') {
-                    setSeats(seats.map((seat, i) => i === index ? 'available' : seat));
-                    setSelectedSeats(selectedSeats.filter(seat => seat !== index));
-                }
-            };
+                seatDiv.addEventListener('click', () => {
+                    if (status === 'available') {
+                        seats[index] = 'booked'; // Change to booked on click
+                        renderSeats(); // Re-render seats to reflect changes
+                        updateSelectedSeats();
+                    } else {
+                        alert('This seat is already booked!');
+                    }
+                    localStorage.setItem('seats', JSON.stringify(seats)); // Save to localStorage
+                });
 
-            const getSeatNumber = (index) => {
-                const row = String.fromCharCode(65 + Math.floor(index / 22));
-                const number = (index % 22) + 1;
-                return `${row}${number}`;
-            };
+                seatChart.appendChild(seatDiv);
+            });
+        }
 
-            const getSeatPrice = (index) => {
-                const row = String.fromCharCode(65 + Math.floor(index / 22));
-                return seatPrices[row] || 250;
-            };
+        // Function to update the selected seats display
+        function updateSelectedSeats() {
+            const bookedSeats = seats.map((status, index) => (status === 'booked' ? index + 1 : null)).filter(Boolean);
+            selectedSeatsText.textContent = `Selected Seats: ${bookedSeats.join(', ') || 'None'}`;
+        }
 
-            const getSeatClass = (status, index) => {
-                const row = String.fromCharCode(65 + Math.floor(index / 22));
-                let rowClass = 'm-o';
-                if (row === 'V') rowClass = 'vip';
-                else if (['A', 'B'].includes(row)) rowClass = 'a-b';
-                else if (['C', 'D', 'E'].includes(row)) rowClass = 'c-e';
-                else if (['F', 'G'].includes(row)) rowClass = 'f-g';
-                else if (['H', 'I', 'J', 'K', 'L'].includes(row)) rowClass = 'h-l';
-                return `seat ${status} ${rowClass}`;
-            };
-
-            const handleSubmit = (e) => {
-                e.preventDefault();
-                console.log('Booking:', { name, phone, seats: selectedSeats.map(getSeatNumber) });
-                alert('Booking submitted! Please send payment slip via WhatsApp to confirm.');
-            };
-
-            return (
-                <div className="container">
-                    <h1>Jatt & Juliet - ICON SIAM</h1>
-                    <h2>Sunday 7th July 2024 - 4 PM</h2>
-                    <div className="seat-chart">
-                        {seats.map((status, index) => (
-                            <div 
-                                key={index} 
-                                className={getSeatClass(status, index)}
-                                onClick={() => status !== 'booked' && toggleSeat(index)}
-                            >
-                                {getSeatNumber(index)}
-                            </div>
-                        ))}
-                    </div>
-                    <div>
-                        <h3>Selected Seats: {selectedSeats.map(getSeatNumber).join(', ')}</h3>
-                        <h3>Total Price: {selectedSeats.reduce((sum, seat) => sum + getSeatPrice(seat), 0)} THB</h3>
-                    </div>
-                    <form onSubmit={handleSubmit}>
-                        <input 
-                            type="text" 
-                            placeholder="Name" 
-                            value={name} 
-                            onChange={(e) => setName(e.target.value)} 
-                            required 
-                        />
-                        <input 
-                            type="tel" 
-                            placeholder="Phone Number" 
-                            value={phone} 
-                            onChange={(e) => setPhone(e.target.value)} 
-                            required 
-                        />
-                        <button type="submit">Book Seats</button>
-                    </form>
-                    <div className="legend">
-                        <div className="legend-item">
-                            <div className="legend-color vip"></div>
-                            <span>VIP - 750 THB</span>
-                        </div>
-                        <div className="legend-item">
-                            <div className="legend-color a-b"></div>
-                            <span>A-B - 500 THB</span>
-                        </div>
-                        <div className="legend-item">
-                            <div className="legend-color c-e"></div>
-                            <span>C-E - 400 THB</span>
-                        </div>
-                        <div className="legend-item">
-                            <div className="legend-color f-g"></div>
-                            <span>F-G - 350 THB</span>
-                        </div>
-                        <div className="legend-item">
-                            <div className="legend-color h-l"></div>
-                            <span>H-L - 300 THB</span>
-                        </div>
-                        <div className="legend-item">
-                            <div className="legend-color m-o"></div>
-                            <span>M-O - 250 THB</span>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        ReactDOM.render(<MovieBooking />, document.getElementById('root'));
+        // Initial render of seats
+        renderSeats();
+        updateSelectedSeats();
     </script>
 </body>
 </html>
