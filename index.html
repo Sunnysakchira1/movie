@@ -280,15 +280,29 @@
     <div id="root"></div>
     <script type="text/babel">
         const MovieBooking = () => {
-            const [seats, setSeats] = React.useState(Array(286).fill('available'));
+            const seatLayout = [
+                { row: 'VIP', seats: 12 },
+                { row: 'A', seats: 15 },
+                { row: 'B', seats: 15 },
+                // ... add other rows as needed
+            ];
+
+            const getTotalSeats = () => seatLayout.reduce((sum, row) => sum + row.seats, 0);
+
+            const [seats, setSeats] = React.useState(() => {
+                const savedSeats = localStorage.getItem('seatStatus');
+                return savedSeats ? JSON.parse(savedSeats) : Array(getTotalSeats()).fill('available');
+            });
             const [selectedSeats, setSelectedSeats] = React.useState([]);
             const [name, setName] = React.useState('');
-            const [isAdminMode, setIsAdminMode] = React.useState(false);
-            const [adminPassword, setAdminPassword] = React.useState('');
             const [showConfirmation, setShowConfirmation] = React.useState(false);
+            const [isAdminMode, setIsAdminMode] = React.useState(false);
             const [confirmedSeats, setConfirmedSeats] = React.useState([]);
             const [confirmedTotalPrice, setConfirmedTotalPrice] = React.useState(0);
-            const correctPassword = '1234'; // Simple password for demo purposes
+
+            React.useEffect(() => {
+                localStorage.setItem('seatStatus', JSON.stringify(seats));
+            }, [seats]);
 
             const seatPrices = {
                 'VIP': 750,
@@ -298,23 +312,6 @@
                 'H': 300, 'I': 300, 'J': 300, 'K': 300, 'L': 300,
                 'M': 250, 'N': 250, 'O': 250
             };
-
-            const seatLayout = [
-                { row: 'VIP', seats: 12 },
-                { row: 'A', seats: 9 },
-                { row: 'B', seats: 9 },
-                ...Array.from({ length: 13 }, (_, i) => ({ row: String.fromCharCode(67 + i), seats: 20 }))
-            ];
-
-            const getTotalSeats = () => {
-                return seatLayout.reduce((total, row) => total + row.seats, 0);
-            };
-
-            React.useEffect(() => {
-                // Simulate some seats being booked
-                const bookedSeats = [10, 11, 50, 51, 100, 101];
-                setSeats(seats.map((seat, index) => bookedSeats.includes(index) ? 'booked' : seat));
-            }, []);
 
             const getSeatNumber = (rowIndex, seatIndex) => {
                 const row = seatLayout[rowIndex].row;
@@ -346,28 +343,23 @@
             };
 
             const toggleSeat = (index, rowIndex, seatIndex) => {
-                const newSeats = [...seats];
-                const seatNumber = getSeatNumber(rowIndex, seatIndex);
-                
-                if (newSeats[index] === 'selected') {
-                    newSeats[index] = 'available';
-                    setSelectedSeats(selectedSeats.filter(seat => seat !== seatNumber));
-                } else if (newSeats[index] === 'available') {
-                    newSeats[index] = 'selected';
-                    setSelectedSeats([...selectedSeats, seatNumber]);
-                }
-                
-                setSeats(newSeats);
-            };
-
-            const updateSeatStatus = (index, status, rowIndex, seatIndex) => {
-                const newSeats = [...seats];
-                newSeats[index] = status;
-                setSeats(newSeats);
-
-                if (status === 'available') {
+                if (isAdminMode) {
+                    const newSeats = [...seats];
+                    newSeats[index] = newSeats[index] === 'booked' ? 'available' : 'booked';
+                    setSeats(newSeats);
+                } else if (seats[index] !== 'booked') {
+                    const newSeats = [...seats];
                     const seatNumber = getSeatNumber(rowIndex, seatIndex);
-                    setSelectedSeats(selectedSeats.filter(seat => seat !== seatNumber));
+                    
+                    if (newSeats[index] === 'selected') {
+                        newSeats[index] = 'available';
+                        setSelectedSeats(selectedSeats.filter(seat => seat !== seatNumber));
+                    } else {
+                        newSeats[index] = 'selected';
+                        setSelectedSeats([...selectedSeats, seatNumber]);
+                    }
+                    
+                    setSeats(newSeats);
                 }
             };
 
@@ -377,7 +369,6 @@
                     setConfirmedSeats([...selectedSeats]);
                     setConfirmedTotalPrice(getTotalPrice());
                     setShowConfirmation(true);
-                    // Here you would typically send the booking data to a server
                     setName('');
                     setSelectedSeats([]);
                     setSeats(seats.map(seat => seat === 'selected' ? 'booked' : seat));
@@ -385,9 +376,9 @@
             };
 
             const toggleAdminMode = () => {
+                const correctPassword = '1234'; // Simple password for demo purposes
                 if (isAdminMode) {
                     setIsAdminMode(false);
-                    setAdminPassword('');
                 } else {
                     const enteredPassword = prompt("Enter admin password:");
                     if (enteredPassword === correctPassword) {
@@ -395,16 +386,6 @@
                     } else {
                         alert("Incorrect password");
                     }
-                }
-            };
-
-            const handleSeatClick = (index, rowIndex, seatIndex) => {
-                if (isAdminMode) {
-                    const newSeats = [...seats];
-                    newSeats[index] = newSeats[index] === 'booked' ? 'available' : 'booked';
-                    setSeats(newSeats);
-                } else if (seats[index] !== 'booked') {
-                    toggleSeat(index, rowIndex, seatIndex);
                 }
             };
 
@@ -450,8 +431,8 @@
                                     return (
                                         <div 
                                             key={seatIndex} 
-                                            className={`seat ${getSeatClass(seats[index], rowIndex)}`}
-                                            onClick={() => handleSeatClick(index, rowIndex, seatIndex)}
+                                            className={`seat ${seats[index]}`}
+                                            onClick={() => toggleSeat(index, rowIndex, seatIndex)}
                                         >
                                             {getSeatNumber(rowIndex, seatIndex)}
                                         </div>
