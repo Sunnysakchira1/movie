@@ -184,16 +184,6 @@
                 setSeats(seats.map((seat, index) => bookedSeats.includes(index) ? 'booked' : seat));
             }, []);
 
-            const toggleSeat = (index) => {
-                if (seats[index] === 'available') {
-                    setSeats(seats.map((seat, i) => i === index ? 'selected' : seat));
-                    setSelectedSeats([...selectedSeats, index]);
-                } else if (seats[index] === 'selected') {
-                    setSeats(seats.map((seat, i) => i === index ? 'available' : seat));
-                    setSelectedSeats(selectedSeats.filter(seat => seat !== index));
-                }
-            };
-
             const getSeatNumber = (rowIndex, seatIndex) => {
                 const row = seatLayout[rowIndex].row;
                 return `${row}${seatIndex + 1}`;
@@ -213,6 +203,32 @@
                 else if (['F', 'G'].includes(row)) rowClass = 'f-g';
                 else if (['H', 'I', 'J', 'K', 'L'].includes(row)) rowClass = 'h-l';
                 return `seat ${status} ${rowClass}`;
+            };
+
+            const toggleSeat = (index, rowIndex, seatIndex) => {
+                const newSeats = [...seats];
+                const seatNumber = getSeatNumber(rowIndex, seatIndex);
+                
+                if (newSeats[index] === 'selected') {
+                    newSeats[index] = 'available';
+                    setSelectedSeats(selectedSeats.filter(seat => seat !== seatNumber));
+                } else if (newSeats[index] === 'available') {
+                    newSeats[index] = 'selected';
+                    setSelectedSeats([...selectedSeats, seatNumber]);
+                }
+                
+                setSeats(newSeats);
+            };
+
+            const updateSeatStatus = (index, status, rowIndex, seatIndex) => {
+                const newSeats = [...seats];
+                newSeats[index] = status;
+                setSeats(newSeats);
+
+                if (status === 'available') {
+                    const seatNumber = getSeatNumber(rowIndex, seatIndex);
+                    setSelectedSeats(selectedSeats.filter(seat => seat !== seatNumber));
+                }
             };
 
             const handleSubmit = (e) => {
@@ -237,10 +253,6 @@
                 setIsAdminPanelOpen(false);
             };
 
-            const updateSeatStatus = (index, status) => {
-                setSeats(seats.map((seat, i) => i === index ? status : seat));
-            };
-
             return (
                 <div className="container">
                     <h1>Bollywood Movie IconSiam</h1>
@@ -256,9 +268,9 @@
                                             className={getSeatClass(seats[index], rowIndex)}
                                             onClick={() => {
                                                 if (isAdminLoggedIn) {
-                                                    updateSeatStatus(index, seats[index] === 'booked' ? 'available' : 'booked');
+                                                    updateSeatStatus(index, seats[index] === 'booked' ? 'available' : 'booked', rowIndex, seatIndex);
                                                 } else if (seats[index] !== 'booked') {
-                                                    toggleSeat(index);
+                                                    toggleSeat(index, rowIndex, seatIndex);
                                                 }
                                             }}
                                         >
@@ -270,8 +282,8 @@
                         ))}
                     </div>
                     <div>
-                        <h3>Selected Seats: {selectedSeats.map(getSeatNumber).join(', ')}</h3>
-                        <h3>Total Price: {selectedSeats.reduce((sum, seat) => sum + getSeatPrice(seat), 0)} THB</h3>
+                        <p>Selected seats: {selectedSeats.join(', ')}</p>
+                        <p>Total price: ${selectedSeats.length * 10}</p>
                     </div>
                     <form onSubmit={handleSubmit}>
                         <input 
