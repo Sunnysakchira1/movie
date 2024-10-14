@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bollywood Movie Booking</title>
+    <title> Movie Booking</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
@@ -284,7 +284,19 @@
                 { row: 'VIP', seats: 12 },
                 { row: 'A', seats: 15 },
                 { row: 'B', seats: 15 },
-                // ... add other rows as needed
+                { row: 'C', seats: 15 },
+                { row: 'D', seats: 15 },
+                { row: 'E', seats: 15 },
+                { row: 'F', seats: 15 },
+                { row: 'G', seats: 15 },
+                { row: 'H', seats: 15 },
+                { row: 'I', seats: 15 },
+                { row: 'J', seats: 15 },
+                { row: 'K', seats: 15 },
+                { row: 'L', seats: 15 },
+                { row: 'M', seats: 15 },
+                { row: 'N', seats: 15 },
+                { row: 'O', seats: 15 }
             ];
 
             const getTotalSeats = () => seatLayout.reduce((sum, row) => sum + row.seats, 0);
@@ -304,15 +316,6 @@
                 localStorage.setItem('seatStatus', JSON.stringify(seats));
             }, [seats]);
 
-            const seatPrices = {
-                'VIP': 750,
-                'A': 500, 'B': 500,
-                'C': 400, 'D': 400, 'E': 400,
-                'F': 350, 'G': 350,
-                'H': 300, 'I': 300, 'J': 300, 'K': 300, 'L': 300,
-                'M': 250, 'N': 250, 'O': 250
-            };
-
             const getSeatNumber = (rowIndex, seatIndex) => {
                 const row = seatLayout[rowIndex].row;
                 return `${row}${seatIndex + 1}`;
@@ -325,17 +328,6 @@
                 if (['F', 'G'].includes(seatNumber[0])) return 350;
                 if (['H', 'I', 'J', 'K', 'L'].includes(seatNumber[0])) return 300;
                 return 250; // For M-O rows
-            };
-
-            const getSeatClass = (status, rowIndex) => {
-                const row = seatLayout[rowIndex].row;
-                let rowClass = 'm-o';
-                if (row === 'VIP') rowClass = 'vip';
-                else if (['A', 'B'].includes(row)) rowClass = 'a-b';
-                else if (['C', 'D', 'E'].includes(row)) rowClass = 'c-e';
-                else if (['F', 'G'].includes(row)) rowClass = 'f-g';
-                else if (['H', 'I', 'J', 'K', 'L'].includes(row)) rowClass = 'h-l';
-                return `seat ${status} ${rowClass}`;
             };
 
             const getTotalPrice = () => {
@@ -396,32 +388,6 @@
                         {isAdminMode ? 'Exit Admin Mode' : 'Admin Mode'}
                     </button>
                     {isAdminMode && <p className="admin-message">Admin Mode: Click seats to toggle booked/available</p>}
-                    <div className="legend">
-                        <div className="legend-item">
-                            <div className="legend-color vip"></div>
-                            <span className="legend-text">VIP ฿750</span>
-                        </div>
-                        <div className="legend-item">
-                            <div className="legend-color a-b"></div>
-                            <span className="legend-text">A-B ฿500</span>
-                        </div>
-                        <div className="legend-item">
-                            <div className="legend-color c-e"></div>
-                            <span className="legend-text">C-E ฿400</span>
-                        </div>
-                        <div className="legend-item">
-                            <div className="legend-color f-g"></div>
-                            <span className="legend-text">F-G ฿350</span>
-                        </div>
-                        <div className="legend-item">
-                            <div className="legend-color h-l"></div>
-                            <span className="legend-text">H-L ฿300</span>
-                        </div>
-                        <div className="legend-item">
-                            <div className="legend-color m-o"></div>
-                            <span className="legend-text">M-O ฿250</span>
-                        </div>
-                    </div>
                     <div className="seat-chart">
                         {seatLayout.map((row, rowIndex) => (
                             <div key={row.row} className="row">
@@ -431,7 +397,7 @@
                                     return (
                                         <div 
                                             key={seatIndex} 
-                                            className={`seat ${seats[index]}`}
+                                            className={`seat ${seats[index]} ${row.row.toLowerCase()}`}
                                             onClick={() => toggleSeat(index, rowIndex, seatIndex)}
                                         >
                                             {getSeatNumber(rowIndex, seatIndex)}
