@@ -267,11 +267,12 @@
             };
 
             const getPriceForSeat = (seatNumber) => {
-                if (seatNumber.startsWith('VIP')) return 1000;
-                if (['A', 'B'].includes(seatNumber[0])) return 800;
-                if (['C', 'D', 'E'].includes(seatNumber[0])) return 700;
-                if (['F', 'G'].includes(seatNumber[0])) return 600;
-                return 500; // For H-O rows
+                if (seatNumber.startsWith('VIP')) return 750;
+                if (['A', 'B'].includes(seatNumber[0])) return 500;
+                if (['C', 'D', 'E'].includes(seatNumber[0])) return 400;
+                if (['F', 'G'].includes(seatNumber[0])) return 350;
+                if (['H', 'I', 'J', 'K', 'L'].includes(seatNumber[0])) return 300;
+                return 250; // For M-O rows
             };
 
             const getTotalPrice = () => {
