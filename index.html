@@ -49,11 +49,11 @@
         }
 
         .row-label {
-            min-width: 30px;
-            text-align: center;
+            min-width: 40px;
+            text-align: right;
+            padding-right: 10px;
             font-weight: 600;
             color: #0071e3;
-            margin-right: 10px;
         }
 
         .seat {
@@ -195,6 +195,11 @@
             font-weight: 600;
         }
 
+        .confirmation-popup em {
+            font-style: italic;
+            color: #666;
+        }
+
         .phone-number {
             font-size: 28px;
             font-weight: 700;
@@ -313,7 +318,11 @@
 
             const getSeatNumber = (rowIndex, seatIndex) => {
                 const row = seatLayout[rowIndex].row;
-                return `${row}${seatIndex + 1}`;
+                if (row === 'VIP') {
+                    return `${seatIndex + 1}`;
+                } else {
+                    return `${row}${seatIndex + 1}`;
+                }
             };
 
             const getSeatPrice = (index) => {
@@ -479,11 +488,13 @@
                     {showConfirmation && (
                         <div className="confirmation-popup">
                             <h2>Booking Confirmation</h2>
+                            <p><strong>Please screenshot this confirmation!</strong></p>
                             <p>Thank you for your booking, {name}!</p>
                             <p>Your confirmed seats: <strong>{confirmedSeats.join(', ')}</strong></p>
                             <p>Total price: <strong>฿{confirmedTotalPrice}</strong></p>
                             <p>To complete your booking, please send your payment slip to the phone number below.</p>
                             <div className="phone-number">0894882620</div>
+                            <p><em>Your booking will be re-confirmed on WhatsApp.</em></p>
                             <button onClick={() => setShowConfirmation(false)}>Close</button>
                         </div>
                     )}
