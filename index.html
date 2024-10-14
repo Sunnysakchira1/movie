@@ -68,24 +68,24 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            color: white; /* Consistent white text for all seats */
+            text-shadow: 0 0 2px rgba(0, 0, 0, 0.5); /* Subtle text shadow for better readability */
         }
 
-        .seat.vip { background-color: #0071e3; color: white; }
-        .seat.a-b { background-color: #3395ff; color: white; }
-        .seat.c-e { background-color: #66b3ff; color: #1d1d1f; }
-        .seat.f-g { background-color: #99cfff; color: #1d1d1f; }
-        .seat.h-l { background-color: #cce6ff; color: #1d1d1f; }
-        .seat.m-o { background-color: #e6f3ff; color: #1d1d1f; }
+        .seat.vip { background-color: #0052a3; }
+        .seat.a-b { background-color: #0071e3; }
+        .seat.c-e { background-color: #1e90ff; }
+        .seat.f-g { background-color: #47a3ff; }
+        .seat.h-l { background-color: #70b7ff; }
+        .seat.m-o { background-color: #99ccff; }
 
         .seat.selected { 
             background-color: #00a86b; 
-            color: white;
-            transform: scale(1.1);
         }
 
         .seat.booked {
-            background-color: #e0e0e0;
-            color: #999;
+            background-color: #a0a0a0;
+            color: #e0e0e0;
             cursor: not-allowed;
         }
 
