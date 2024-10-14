@@ -16,6 +16,7 @@
             padding: 0;
         }
         .container { 
+            
             max-width: 1000px; 
             margin: 0 auto; 
             padding: 20px;
@@ -97,6 +98,22 @@
             transition: background-color 0.3s ease;
         }
         button:hover { background-color: #0052a3; }
+        .admin-panel {
+            background-color: #f0f8ff;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .admin-panel form {
+            display: flex;
+            gap: 10px;
+        }
+
+        .admin-panel input {
+            flex-grow: 1;
+        }
     </style>
 </head>
 <body>
@@ -107,6 +124,9 @@
             const [selectedSeats, setSelectedSeats] = React.useState([]);
             const [name, setName] = React.useState('');
             const [phone, setPhone] = React.useState('');
+            const [isAdminPanelOpen, setIsAdminPanelOpen] = React.useState(false);
+            const [adminPassword, setAdminPassword] = React.useState('');
+            const [isAdminLoggedIn, setIsAdminLoggedIn] = React.useState(false);
 
             const seatPrices = {
                 'VIP': 750,
@@ -161,16 +181,67 @@
                 alert('Booking submitted! Please send payment slip via WhatsApp to confirm.');
             };
 
+            const handleAdminLogin = (e) => {
+                e.preventDefault();
+                // In a real application, you should use a secure authentication method
+                if (adminPassword === 'admin123') {
+                    setIsAdminLoggedIn(true);
+                    setAdminPassword('');
+                } else {
+                    alert('Incorrect password');
+                }
+            };
+
+            const handleAdminLogout = () => {
+                setIsAdminLoggedIn(false);
+                setIsAdminPanelOpen(false);
+            };
+
+            const updateSeatStatus = (index, status) => {
+                setSeats(seats.map((seat, i) => i === index ? status : seat));
+            };
+
             return (
                 <div className="container">
                     <h1>Jatt & Juliet - ICON SIAM</h1>
                     <h2>Sunday 7th July 2024 - 4 PM</h2>
+                    <button onClick={() => setIsAdminPanelOpen(!isAdminPanelOpen)}>
+                        {isAdminPanelOpen ? 'Close Admin Panel' : 'Open Admin Panel'}
+                    </button>
+                    {isAdminPanelOpen && (
+                        <div className="admin-panel">
+                            {!isAdminLoggedIn ? (
+                                <form onSubmit={handleAdminLogin}>
+                                    <input
+                                        type="password"
+                                        placeholder="Admin Password"
+                                        value={adminPassword}
+                                        onChange={(e) => setAdminPassword(e.target.value)}
+                                        required
+                                    />
+                                    <button type="submit">Login</button>
+                                </form>
+                            ) : (
+                                <div>
+                                    <h3>Admin Panel</h3>
+                                    <p>Click on seats to toggle their status</p>
+                                    <button onClick={handleAdminLogout}>Logout</button>
+                                </div>
+                            )}
+                        </div>
+                    )}
                     <div className="seat-chart">
                         {seats.map((status, index) => (
                             <div 
                                 key={index} 
                                 className={getSeatClass(status, index)}
-                                onClick={() => status !== 'booked' && toggleSeat(index)}
+                                onClick={() => {
+                                    if (isAdminLoggedIn) {
+                                        updateSeatStatus(index, status === 'booked' ? 'available' : 'booked');
+                                    } else if (status !== 'booked') {
+                                        toggleSeat(index);
+                                    }
+                                }}
                             >
                                 {getSeatNumber(index)}
                             </div>
