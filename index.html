@@ -341,16 +341,33 @@
                 return `seat ${status} ${rowClass}`;
             };
 
+            const getPriceForSeat = (rowIndex, seatIndex) => {
+                const row = seatLayout[rowIndex].row;
+                if (row === 'VIP') return 750;
+                if (['A', 'B'].includes(row)) return 500;
+                if (['C', 'D', 'E'].includes(row)) return 400;
+                if (['F', 'G'].includes(row)) return 350;
+                if (['H', 'I', 'J', 'K', 'L'].includes(row)) return 300;
+                return 250; // For M-O rows
+            };
+
+            const getTotalPrice = () => {
+                return selectedSeats.reduce((total, seat) => {
+                    const [rowIndex, seatIndex] = seat.split('-').map(Number);
+                    return total + getPriceForSeat(rowIndex, seatIndex);
+                }, 0);
+            };
+
             const toggleSeat = (index, rowIndex, seatIndex) => {
                 const newSeats = [...seats];
-                const seatNumber = getSeatNumber(rowIndex, seatIndex);
+                const seatId = `${rowIndex}-${seatIndex}`;
                 
                 if (newSeats[index] === 'selected') {
                     newSeats[index] = 'available';
-                    setSelectedSeats(selectedSeats.filter(seat => seat !== seatNumber));
+                    setSelectedSeats(selectedSeats.filter(seat => seat !== seatId));
                 } else if (newSeats[index] === 'available') {
                     newSeats[index] = 'selected';
-                    setSelectedSeats([...selectedSeats, seatNumber]);
+                    setSelectedSeats([...selectedSeats, seatId]);
                 }
                 
                 setSeats(newSeats);
@@ -365,19 +382,6 @@
                     const seatNumber = getSeatNumber(rowIndex, seatIndex);
                     setSelectedSeats(selectedSeats.filter(seat => seat !== seatNumber));
                 }
-            };
-
-            const getPriceForSeat = (seatNumber) => {
-                if (seatNumber.startsWith('VIP')) return 750;
-                if (['A', 'B'].includes(seatNumber[0])) return 500;
-                if (['C', 'D', 'E'].includes(seatNumber[0])) return 400;
-                if (['F', 'G'].includes(seatNumber[0])) return 350;
-                if (['H', 'I', 'J', 'K', 'L'].includes(seatNumber[0])) return 300;
-                return 250; // For M-O rows
-            };
-
-            const getTotalPrice = () => {
-                return selectedSeats.reduce((total, seat) => total + getPriceForSeat(seat), 0);
             };
 
             const handleSubmit = (e) => {
