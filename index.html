@@ -280,7 +280,10 @@
     <div id="root"></div>
     <script type="text/babel">
         const MovieBooking = () => {
-            const [seats, setSeats] = React.useState(Array(286).fill('available'));
+            const [seats, setSeats] = React.useState(() => {
+                const savedSeats = localStorage.getItem('seatStatus');
+                return savedSeats ? JSON.parse(savedSeats) : Array(getTotalSeats()).fill('available');
+            });
             const [selectedSeats, setSelectedSeats] = React.useState([]);
             const [name, setName] = React.useState('');
             const [isAdminMode, setIsAdminMode] = React.useState(false);
@@ -309,6 +312,10 @@
             const getTotalSeats = () => {
                 return seatLayout.reduce((total, row) => total + row.seats, 0);
             };
+
+            React.useEffect(() => {
+                localStorage.setItem('seatStatus', JSON.stringify(seats));
+            }, [seats]);
 
             React.useEffect(() => {
                 // Simulate some seats being booked
@@ -387,7 +394,6 @@
             const toggleAdminMode = () => {
                 if (isAdminMode) {
                     setIsAdminMode(false);
-                    setAdminPassword('');
                 } else {
                     const enteredPassword = prompt("Enter admin password:");
                     if (enteredPassword === correctPassword) {
@@ -450,7 +456,7 @@
                                     return (
                                         <div 
                                             key={seatIndex} 
-                                            className={`seat ${getSeatClass(seats[index], rowIndex)}`}
+                                            className={`seat ${seats[index]}`}
                                             onClick={() => handleSeatClick(index, rowIndex, seatIndex)}
                                         >
                                             {getSeatNumber(rowIndex, seatIndex)}
