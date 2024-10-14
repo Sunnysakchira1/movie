@@ -10,154 +10,148 @@
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
-            background-color: #f5f5f7;
+            background-color: #ffffff;
             color: #1d1d1f;
             line-height: 1.5;
+            margin: 0;
+            padding: 0;
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 40px 20px;
+            padding: 60px 20px;
         }
 
         h1 {
-            font-size: 40px;
+            font-size: 48px;
             font-weight: 700;
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 60px;
+            color: #0071e3;
         }
 
         .seat-chart {
-            background-color: white;
-            border-radius: 18px;
-            padding: 30px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(180deg, #f0f0f0 0%, #ffffff 100%);
+            border-radius: 30px;
+            padding: 50px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .row {
             display: flex;
-            align-items: center;
-            margin-bottom: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
         }
 
         .row-label {
             width: 40px;
             text-align: right;
-            padding-right: 15px;
+            padding-right: 20px;
             font-weight: 600;
+            color: #0071e3;
         }
 
         .seat {
-            width: 30px;
-            height: 30px;
+            width: 35px;
+            height: 35px;
             display: flex;
             justify-content: center;
             align-items: center;
-            border-radius: 6px;
-            margin: 0 2px;
+            border-radius: 8px;
+            margin: 0 4px;
             font-size: 12px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
         }
 
-        .seat.available {
-            background-color: #e0e0e0;
-            color: #1d1d1f;
-        }
+        .seat.vip { background-color: #0071e3; color: white; }
+        .seat.a-b { background-color: #3395ff; color: white; }
+        .seat.c-e { background-color: #66b3ff; color: #1d1d1f; }
+        .seat.f-g { background-color: #99cfff; color: #1d1d1f; }
+        .seat.h-l { background-color: #cce6ff; color: #1d1d1f; }
+        .seat.m-o { background-color: #e6f3ff; color: #1d1d1f; }
 
-        .seat.selected {
-            background-color: #0071e3;
+        .seat.selected { 
+            background-color: #00a86b; 
             color: white;
+            transform: scale(1.1);
         }
 
         .seat.booked {
-            background-color: #86868b;
-            color: white;
+            background-color: #e0e0e0;
+            color: #999;
             cursor: not-allowed;
         }
 
         .booking-info {
-            background-color: white;
-            border-radius: 18px;
-            padding: 30px;
-            margin-top: 30px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+            border-radius: 30px;
+            padding: 40px;
+            margin-top: 50px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
         }
 
         form {
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            margin-top: 20px;
+            gap: 20px;
+            margin-top: 30px;
         }
 
         input[type="text"] {
-            padding: 12px 15px;
-            border-radius: 8px;
-            border: 1px solid #d2d2d7;
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: 2px solid #e0e0e0;
             font-size: 16px;
-            transition: border-color 0.2s ease;
+            transition: all 0.3s ease;
         }
 
         input[type="text"]:focus {
             border-color: #0071e3;
             outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.2);
         }
 
         button {
             background-color: #0071e3;
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 16px;
+            padding: 15px 25px;
+            border-radius: 12px;
+            font-size: 18px;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: all 0.3s ease;
         }
 
         button:hover {
-            background-color: #0077ed;
+            background-color: #005bbf;
+            transform: translateY(-2px);
         }
 
         .legend {
             display: flex;
             justify-content: center;
+            flex-wrap: wrap;
             gap: 20px;
-            margin-top: 30px;
+            margin-top: 40px;
         }
 
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .legend-color {
-            width: 20px;
-            height: 20px;
-            border-radius: 4px;
-        }
-
-        .admin-button {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background-color: #86868b;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-
-        .admin-button:hover {
-            background-color: #6e6e73;
+            width: 25px;
+            height: 25px;
+            border-radius: 6px;
         }
 
         .confirmation-popup {
@@ -165,56 +159,31 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: white;
-            padding: 30px;
-            border-radius: 18px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
             text-align: center;
             max-width: 90%;
-            width: 400px;
+            width: 450px;
         }
 
         .confirmation-popup h2 {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 700;
-            margin-bottom: 20px;
-            color: #1d1d1f;
-        }
-
-        .confirmation-popup p {
-            margin-bottom: 15px;
-            color: #1d1d1f;
-        }
-
-        .confirmation-popup strong {
+            margin-bottom: 25px;
             color: #0071e3;
         }
 
         .phone-number {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 700;
-            margin: 20px 0;
-            padding: 15px;
+            margin: 25px 0;
+            padding: 20px;
             background-color: #f5f5f7;
-            border-radius: 10px;
+            border-radius: 15px;
             display: inline-block;
-            color: #1d1d1f;
-        }
-
-        .confirmation-popup button {
-            background-color: #0071e3;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-
-        .confirmation-popup button:hover {
-            background-color: #0077ed;
+            color: #0071e3;
         }
     </style>
 </head>
@@ -357,7 +326,7 @@
                                     return (
                                         <div 
                                             key={seatIndex} 
-                                            className={getSeatClass(seats[index], rowIndex)}
+                                            className={`seat ${getSeatClass(seats[index], rowIndex)}`}
                                             onClick={() => {
                                                 if (isAdminLoggedIn) {
                                                     updateSeatStatus(index, seats[index] === 'booked' ? 'available' : 'booked', rowIndex, seatIndex);
@@ -443,7 +412,7 @@
                             <h2>Booking Confirmation</h2>
                             <p>Thank you for your booking, {name}!</p>
                             <p>Your confirmed seats: <strong>{confirmedSeats.join(', ')}</strong></p>
-                            <p>To complete your booking, please send your payment slip to the phone number mentioned below.</p>
+                            <p>To complete your booking, please send your payment slip to the phone number below.</p>
                             <div className="phone-number">0894882620</div>
                             <button onClick={() => setShowConfirmation(false)}>Close</button>
                         </div>
