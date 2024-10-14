@@ -318,16 +318,16 @@
 
             const getSeatNumber = (rowIndex, seatIndex) => {
                 const row = seatLayout[rowIndex].row;
-                if (row === 'VIP') {
-                    return `${seatIndex + 1}`;
-                } else {
-                    return `${row}${seatIndex + 1}`;
-                }
+                return `${row}${seatIndex + 1}`;
             };
 
-            const getSeatPrice = (index) => {
-                const row = String.fromCharCode(65 + Math.floor(index / 22));
-                return seatPrices[row] || 250;
+            const getPriceForSeat = (seatNumber) => {
+                if (seatNumber.startsWith('VIP')) return 750;
+                if (['A', 'B'].includes(seatNumber[0])) return 500;
+                if (['C', 'D', 'E'].includes(seatNumber[0])) return 400;
+                if (['F', 'G'].includes(seatNumber[0])) return 350;
+                if (['H', 'I', 'J', 'K', 'L'].includes(seatNumber[0])) return 300;
+                return 250; // For M-O rows
             };
 
             const getSeatClass = (status, rowIndex) => {
@@ -341,33 +341,20 @@
                 return `seat ${status} ${rowClass}`;
             };
 
-            const getPriceForSeat = (rowIndex, seatIndex) => {
-                const row = seatLayout[rowIndex].row;
-                if (row === 'VIP') return 750;
-                if (['A', 'B'].includes(row)) return 500;
-                if (['C', 'D', 'E'].includes(row)) return 400;
-                if (['F', 'G'].includes(row)) return 350;
-                if (['H', 'I', 'J', 'K', 'L'].includes(row)) return 300;
-                return 250; // For M-O rows
-            };
-
             const getTotalPrice = () => {
-                return selectedSeats.reduce((total, seat) => {
-                    const [rowIndex, seatIndex] = seat.split('-').map(Number);
-                    return total + getPriceForSeat(rowIndex, seatIndex);
-                }, 0);
+                return selectedSeats.reduce((total, seat) => total + getPriceForSeat(seat), 0);
             };
 
             const toggleSeat = (index, rowIndex, seatIndex) => {
                 const newSeats = [...seats];
-                const seatId = `${rowIndex}-${seatIndex}`;
+                const seatNumber = getSeatNumber(rowIndex, seatIndex);
                 
                 if (newSeats[index] === 'selected') {
                     newSeats[index] = 'available';
-                    setSelectedSeats(selectedSeats.filter(seat => seat !== seatId));
+                    setSelectedSeats(selectedSeats.filter(seat => seat !== seatNumber));
                 } else if (newSeats[index] === 'available') {
                     newSeats[index] = 'selected';
-                    setSelectedSeats([...selectedSeats, seatId]);
+                    setSelectedSeats([...selectedSeats, seatNumber]);
                 }
                 
                 setSeats(newSeats);
