@@ -144,6 +144,41 @@
         .admin-button:hover {
             background-color: #0052a3;
         }
+
+        .confirmation-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .phone-number {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        .confirmation-popup button {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .confirmation-popup button:hover {
+            background-color: #0052a3;
+        }
     </style>
 </head>
 <body>
@@ -153,10 +188,10 @@
             const [seats, setSeats] = React.useState(Array(286).fill('available'));
             const [selectedSeats, setSelectedSeats] = React.useState([]);
             const [name, setName] = React.useState('');
-            const [phone, setPhone] = React.useState('');
             const [isAdminPanelOpen, setIsAdminPanelOpen] = React.useState(false);
             const [adminPassword, setAdminPassword] = React.useState('');
             const [isAdminLoggedIn, setIsAdminLoggedIn] = React.useState(false);
+            const [showConfirmation, setShowConfirmation] = React.useState(false);
 
             const seatPrices = {
                 'VIP': 750,
@@ -231,10 +266,28 @@
                 }
             };
 
+            const getPriceForSeat = (seatNumber) => {
+                if (seatNumber.startsWith('VIP')) return 1000;
+                if (['A', 'B'].includes(seatNumber[0])) return 800;
+                if (['C', 'D', 'E'].includes(seatNumber[0])) return 700;
+                if (['F', 'G'].includes(seatNumber[0])) return 600;
+                return 500; // For H-O rows
+            };
+
+            const getTotalPrice = () => {
+                return selectedSeats.reduce((total, seat) => total + getPriceForSeat(seat), 0);
+            };
+
             const handleSubmit = (e) => {
                 e.preventDefault();
-                console.log('Booking:', { name, phone, seats: selectedSeats.map(getSeatNumber) });
-                alert('Booking submitted! Please send payment slip via WhatsApp to confirm.');
+                if (selectedSeats.length > 0 && name) {
+                    setShowConfirmation(true);
+                    // Here you would typically send the booking data to a server
+                    // For now, we'll just clear the form and selected seats
+                    setName('');
+                    setSelectedSeats([]);
+                    setSeats(seats.map(seat => seat === 'selected' ? 'booked' : seat));
+                }
             };
 
             const handleAdminLogin = (e) => {
@@ -283,7 +336,7 @@
                     </div>
                     <div>
                         <p>Selected seats: {selectedSeats.join(', ')}</p>
-                        <p>Total price: ${selectedSeats.length * 10}</p>
+                        <p>Total price: ฿{getTotalPrice()}</p>
                     </div>
                     <form onSubmit={handleSubmit}>
                         <input 
@@ -291,14 +344,6 @@
                             placeholder="Name" 
                             value={name} 
                             onChange={(e) => setName(e.target.value)} 
-                            required 
-                        />
-                        <input 
-                            type="tel" 
-                            placeholder="Phone Number (e.g., 081-234-5678)" 
-                            value={phone} 
-                            onChange={(e) => setPhone(e.target.value)} 
-                            pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
                             required 
                         />
                         <button type="submit">Book Seats</button>
@@ -352,6 +397,13 @@
                                     <button onClick={handleAdminLogout}>Logout</button>
                                 </div>
                             )}
+                        </div>
+                    )}
+                    {showConfirmation && (
+                        <div className="confirmation-popup">
+                            <p>To confirm your booking, please send your payment slip to the phone number mentioned below.</p>
+                            <div className="phone-number">0894882620</div>
+                            <button onClick={() => setShowConfirmation(false)}>Close</button>
                         </div>
                     )}
                 </div>
